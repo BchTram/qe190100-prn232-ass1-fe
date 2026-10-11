@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import ProjectForm, { type ProjectFormValues } from '@/components/ProjectForm';
 import ProjectTable from '@/components/ProjectTable';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { departmentApi } from '@/services/departmentApi';
 import { projectApi } from '@/services/projectApi';
 import type { Department } from '@/types/department';
@@ -23,6 +24,8 @@ export default function ProjectsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const editingProject = useMemo(
@@ -147,25 +150,20 @@ export default function ProjectsPage() {
     setError(null);
   };
 
-  const handleDelete = async (projectId: number) => {
-    const project = projects.find((item) => item.projectId === projectId);
-    if (!project) {
-      return;
-    }
+  const handleDelete = (projectId: number) => {
+    setDeleteTarget(projects.find((item) => item.projectId === projectId) ?? null);
+  };
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${project.projectName}"?`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const projectId = deleteTarget.projectId;
+    setIsDeleting(true);
     setIsLoading(true);
     setError(null);
 
     try {
       await projectApi.remove(projectId);
+      setDeleteTarget(null);
       setProjects((prev) => prev.filter((item) => item.projectId !== projectId));
       if (editingId === projectId) {
         setEditingId(null);
@@ -173,6 +171,7 @@ export default function ProjectsPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete project.');
     } finally {
+      setIsDeleting(false);
       setIsLoading(false);
     }
   };
@@ -183,7 +182,7 @@ export default function ProjectsPage() {
         <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-violet-600">Planning</p>
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-700">Planning</p>
               <h1 className="mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Projects</h1>
             </div>
 
@@ -198,13 +197,13 @@ export default function ProjectsPage() {
                   }
                 }}
                 placeholder="Search projects..."
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100 md:w-64"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:w-64"
               />
 
               <select
                 value={departmentFilter}
                 onChange={(event) => setDepartmentFilter(event.target.value === '' ? '' : Number(event.target.value))}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All departments</option>
                 {departments.map((department) => (
@@ -217,7 +216,7 @@ export default function ProjectsPage() {
               <button
                 type="button"
                 onClick={() => void handleSearch()}
-                className="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700"
+                className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
               >
                 Search
               </button>
@@ -267,6 +266,14 @@ export default function ProjectsPage() {
           </section>
         </div>
       </div>
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Delete project?"
+        description={`This will permanently delete ${deleteTarget?.projectName ?? 'this project'}.`}
+        pending={isDeleting}
+        onConfirm={() => void confirmDelete()}
+      />
     </main>
   );
 }

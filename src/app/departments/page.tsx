@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import DepartmentForm from '@/components/DepartmentForm';
 import DepartmentTable from '@/components/DepartmentTable';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { departmentApi } from '@/services/departmentApi';
 import type { Department, DepartmentCreateRequest, DepartmentUpdateRequest } from '@/types/department';
 
@@ -12,6 +13,8 @@ export default function DepartmentsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const editingDepartment = useMemo(
@@ -103,25 +106,20 @@ export default function DepartmentsPage() {
     setError(null);
   };
 
-  const handleDelete = async (departmentId: number) => {
-    const department = departments.find((item) => item.departmentId === departmentId);
-    if (!department) {
-      return;
-    }
+  const handleDelete = (departmentId: number) => {
+    setDeleteTarget(departments.find((item) => item.departmentId === departmentId) ?? null);
+  };
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${department.departmentName}"?`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const departmentId = deleteTarget.departmentId;
+    setIsDeleting(true);
     setIsLoading(true);
     setError(null);
 
     try {
       await departmentApi.remove(departmentId);
+      setDeleteTarget(null);
       setDepartments((prev) =>
         prev.filter((item) => item.departmentId !== departmentId),
       );
@@ -131,6 +129,7 @@ export default function DepartmentsPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete department.');
     } finally {
+      setIsDeleting(false);
       setIsLoading(false);
     }
   };
@@ -141,7 +140,7 @@ export default function DepartmentsPage() {
         <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-600">Management</p>
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-700">Management</p>
               <h1 className="mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Departments</h1>
             </div>
           </div>
@@ -158,12 +157,12 @@ export default function DepartmentsPage() {
                   }
                 }}
                 placeholder="Search departments..."
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
               <button
                 type="button"
                 onClick={() => void handleSearch()}
-                className="rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-sky-700"
+                className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
               >
                 Search
               </button>
@@ -216,6 +215,14 @@ export default function DepartmentsPage() {
           </section>
         </div>
       </div>
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Delete department?"
+        description={`This will permanently delete ${deleteTarget?.departmentName ?? 'this department'}.`}
+        pending={isDeleting}
+        onConfirm={() => void confirmDelete()}
+      />
     </main>
   );
 }

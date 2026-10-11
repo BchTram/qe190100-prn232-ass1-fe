@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import TaskForm, { type TaskFormValues } from '@/components/TaskForm';
 import TaskTable from '@/components/TaskTable';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { projectApi } from '@/services/projectApi';
 import { taskApi } from '@/services/taskApi';
 import type { Project } from '@/types/project';
@@ -32,6 +33,8 @@ export default function TasksPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Task | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const editingTask = useMemo(
@@ -148,25 +151,20 @@ export default function TasksPage() {
     setError(null);
   };
 
-  const handleDelete = async (taskId: number) => {
-    const task = tasks.find((item) => item.taskId === taskId);
-    if (!task) {
-      return;
-    }
+  const handleDelete = (taskId: number) => {
+    setDeleteTarget(tasks.find((item) => item.taskId === taskId) ?? null);
+  };
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${task.title}"?`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const taskId = deleteTarget.taskId;
+    setIsDeleting(true);
     setIsLoading(true);
     setError(null);
 
     try {
       await taskApi.remove(taskId);
+      setDeleteTarget(null);
       setTasks((prev) => prev.filter((item) => item.taskId !== taskId));
       if (editingId === taskId) {
         setEditingId(null);
@@ -174,6 +172,7 @@ export default function TasksPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete task.');
     } finally {
+      setIsDeleting(false);
       setIsLoading(false);
     }
   };
@@ -184,7 +183,7 @@ export default function TasksPage() {
         <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-600">Execution</p>
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-700">Execution</p>
               <h1 className="mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Tasks</h1>
             </div>
 
@@ -199,13 +198,13 @@ export default function TasksPage() {
                   }
                 }}
                 placeholder="Search tasks..."
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 md:w-64"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:w-64"
               />
 
               <select
                 value={projectFilter}
                 onChange={(event) => setProjectFilter(event.target.value === '' ? '' : Number(event.target.value))}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All projects</option>
                 {projects.map((project) => (
@@ -218,7 +217,7 @@ export default function TasksPage() {
               <select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value === '' ? '' : Number(event.target.value))}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All statuses</option>
                 {Object.entries(statusLabels).map(([key, label]) => (
@@ -229,7 +228,7 @@ export default function TasksPage() {
               <select
                 value={priorityFilter}
                 onChange={(event) => setPriorityFilter(event.target.value === '' ? '' : Number(event.target.value))}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All priorities</option>
                 {Object.entries(priorityLabels).map(([key, label]) => (
@@ -240,7 +239,7 @@ export default function TasksPage() {
               <button
                 type="button"
                 onClick={() => void handleSearch()}
-                className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
+                className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
               >
                 Search
               </button>
@@ -291,6 +290,14 @@ export default function TasksPage() {
           </section>
         </div>
       </div>
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Delete task?"
+        description={`This will permanently delete ${deleteTarget?.title ?? 'this task'}.`}
+        pending={isDeleting}
+        onConfirm={() => void confirmDelete()}
+      />
     </main>
   );
 }

@@ -253,7 +253,7 @@ export default function ProjectForm({
           <button
             type="submit"
             disabled={isLoading}
-            className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-violet-300"
+            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
           >
             {isLoading
               ? (mode === 'create' ? 'Creating...' : 'Saving...')

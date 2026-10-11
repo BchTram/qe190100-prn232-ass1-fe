@@ -93,7 +93,7 @@ export default function TaskTable({
                   <button
                     type="button"
                     onClick={() => onEdit(task)}
-                    className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100"
+                    className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
                   >
                     Edit
                   </button>

@@ -68,7 +68,7 @@ export default function DepartmentTable({
                   <button
                     type="button"
                     onClick={() => onEdit(department)}
-                    className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-100"
+                    className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
                   >
                     Edit
                   </button>

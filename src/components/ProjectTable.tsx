@@ -89,7 +89,7 @@ export default function ProjectTable({
                   <button
                     type="button"
                     onClick={() => onEdit(project)}
-                    className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700 transition hover:bg-violet-100"
+                    className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
                   >
                     Edit
                   </button>

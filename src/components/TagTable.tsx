@@ -62,7 +62,7 @@ export default function TagTable({
                   <button
                     type="button"
                     onClick={() => onEdit(tag)}
-                    className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition hover:bg-amber-100"
+                    className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
                   >
                     Edit
                   </button>

@@ -2,6 +2,9 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 import { departmentApi } from '@/services/departmentApi';
 import { projectApi } from '@/services/projectApi';
 import { taskApi } from '@/services/taskApi';
@@ -129,6 +132,7 @@ function ArrowIcon() {
 }
 
 export default function Home() {
+  const { currentUser, loading: authLoading, logout } = useAuth();
   const [counts, setCounts] = useState<Record<CountKey, number | '—' | null>>({
     departments: null,
     projects: null,
@@ -164,17 +168,42 @@ export default function Home() {
               <Icon name="tasks" className="size-5" />
             </span>
             <span className="text-sm font-bold tracking-normal text-slate-900 sm:text-base">
-              Task Management System
+              <span className="sm:hidden">TaskTrack</span>
+              <span className="hidden sm:inline">Task Management System</span>
             </span>
           </Link>
-          <Link
-            href="/search"
-            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-3.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#176f69]"
-          >
-            <Icon name="search" className="size-4" />
-            <span className="hidden sm:inline">Search workspace</span>
-            <span className="sm:hidden">Search</span>
-          </Link>
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <Link
+              href="/search"
+              className="hidden min-h-9 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#176f69] sm:inline-flex"
+            >
+              <Icon name="search" className="size-4" />
+              Search workspace
+            </Link>
+            {authLoading ? (
+              <span aria-hidden="true" className="h-9 w-28" />
+            ) : currentUser ? (
+              <>
+                <div className="max-w-24 text-right sm:max-w-44">
+                  <p className="truncate text-xs font-semibold text-slate-800 sm:text-sm">{currentUser.fullName}</p>
+                  <p className="hidden truncate text-xs text-slate-500 sm:block">{currentUser.email}</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={logout} aria-label="Log out" title="Log out" className="gap-1.5 px-2 sm:px-3">
+                  <LogOut className="size-4" />
+                  <span className="hidden sm:inline">Log out</span>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button type="button" nativeButton={false} variant="outline" size="sm" className="px-2.5 sm:px-3" render={<Link href="/login" />}>
+                  Sign In
+                </Button>
+                <Button type="button" nativeButton={false} size="sm" className="bg-blue-600 px-2.5 text-white hover:bg-blue-700 sm:px-3" render={<Link href="/register" />}>
+                  Sign Up
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
