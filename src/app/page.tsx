@@ -199,7 +199,7 @@ export default function Home() {
                   Sign In
                 </Button>
                 <Button type="button" nativeButton={false} size="sm" className="bg-blue-600 px-2.5 text-white hover:bg-blue-700 sm:px-3" render={<Link href="/register" />}>
-                  Sign Up
+                  Register
                 </Button>
               </>
             )}
