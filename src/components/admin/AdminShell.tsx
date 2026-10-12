@@ -65,7 +65,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     <p className="truncate text-xs font-medium text-slate-900 sm:text-sm">{currentUser.fullName}</p>
                     <p className="hidden max-w-52 truncate text-xs text-slate-500 sm:block">{currentUser.email}</p>
                   </div>
-                  <span className="hidden rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 sm:inline-flex">{role === 1 ? "Admin" : "Member"}</span>
+                  <span className="hidden rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 sm:inline-flex">{role === 1 ? "Admin" : "Staff"}</span>
                   <Button type="button" variant="outline" size="sm" onClick={logout} aria-label="Log out" title="Log out" className="gap-1.5 px-2 sm:gap-2 sm:px-3">
                     <LogOut className="size-4" /><span className="hidden sm:inline">Log out</span>
                   </Button>

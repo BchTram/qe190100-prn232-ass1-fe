@@ -48,7 +48,7 @@ export default function AdminDashboardPage() {
     { title: "Total Departments", value: counts.departments ?? "—", detail: "Teams across the organization", icon: Building2, iconClassName: "bg-cyan-50 text-cyan-700" },
     { title: "Total Projects", value: counts.projects ?? "—", detail: "Initiatives in the workspace", icon: BriefcaseBusiness, iconClassName: "bg-orange-50 text-orange-700" },
     { title: "Total Tasks", value: counts.tasks ?? "—", detail: "Tracked work items", icon: CheckCircle2, iconClassName: "bg-emerald-50 text-emerald-700" },
-    { title: "Total Accounts", value: role === 1 ? counts.accounts ?? "—" : "Admin", detail: role === 1 ? "Registered workspace members" : "Restricted to administrators", icon: Users, iconClassName: "bg-blue-50 text-blue-700" },
+    { title: "Total Accounts", value: role === 1 ? counts.accounts ?? "—" : "Admin", detail: role === 1 ? "Registered staff accounts" : "Restricted to administrators", icon: Users, iconClassName: "bg-blue-50 text-blue-700" },
   ];
 
   return (
@@ -68,7 +68,7 @@ export default function AdminDashboardPage() {
               <h3 className="mt-4 text-sm font-semibold text-slate-950">{label}</h3><p className="mt-1 text-sm text-slate-600">{detail}</p>
             </Link>
           ))}
-          {role === 1 && <Link href="/admin/accounts" className="group flex min-h-36 flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"><div className="flex items-center justify-between"><span className="grid size-10 place-items-center rounded-md bg-blue-50 text-blue-700"><Users className="size-5" /></span><ArrowRight className="size-4 text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-700" /></div><h3 className="mt-4 text-sm font-semibold text-slate-950">Accounts</h3><p className="mt-1 text-sm text-slate-600">Manage members and access roles.</p></Link>}
+          {role === 1 && <Link href="/admin/accounts" className="group flex min-h-36 flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"><div className="flex items-center justify-between"><span className="grid size-10 place-items-center rounded-md bg-blue-50 text-blue-700"><Users className="size-5" /></span><ArrowRight className="size-4 text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-700" /></div><h3 className="mt-4 text-sm font-semibold text-slate-950">Accounts</h3><p className="mt-1 text-sm text-slate-600">Manage staff and access roles.</p></Link>}
         </div>
       </section>
     </div>
